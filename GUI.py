@@ -29,25 +29,25 @@ class GUI:
         self.pls = Label(self.register, text="Are you new? Register here", justify=CENTER, font="Helvetica 14 bold")
         self.pls.place(relheight=0.15, relx=0.2, rely=0.07)
         
-        self.labelName = Label(self.register, text="Name: ", font="Helvetica 12")
-        self.labelName.place(relheight=0.2, relx=0.1, rely=0.2)
-        self.entryName = Entry(self.register, font="Helvetica 14")
-        self.entryName.place(relwidth=0.4, relheight=0.12, relx=0.35, rely=0.2)
-        self.entryName.focus()
+        self.labelrName = Label(self.register, text="Name: ", font="Helvetica 12")
+        self.labelrName.place(relheight=0.2, relx=0.1, rely=0.2)
+        self.entryrName = Entry(self.register, font="Helvetica 14")
+        self.entryrName.place(relwidth=0.4, relheight=0.12, relx=0.35, rely=0.2)
+        self.entryrName.focus()
         
         
-        self.labelPass = Label(self.register, text="Password: ", font="Helvetica 12")
-        self.labelPass.place(relheight=0.2, relx=0.1, rely=0.35)
-        self.entryPass = Entry(self.register, font="Helvetica 14", show="*")
-        self.entryPass.place(relwidth=0.4, relheight=0.12, relx=0.35, rely=0.35)
+        self.labelrPass = Label(self.register, text="Password: ", font="Helvetica 12")
+        self.labelrPass.place(relheight=0.2, relx=0.1, rely=0.35)
+        self.entryrPass = Entry(self.register, font="Helvetica 14", show="*")
+        self.entryrPass.place(relwidth=0.4, relheight=0.12, relx=0.35, rely=0.35)
         
         
-        self.labelPass2 = Label(self.register, text="Confirm Password: ", font="Helvetica 12")
-        self.labelPass2.place(relheight=0.2, relx=0.1, rely=0.5)
-        self.entryPass2 = Entry(self.register, font="Helvetica 14", show="*")
-        self.entryPass2.place(relwidth=0.4, relheight=0.12, relx=0.35, rely=0.5)
-        self.go = Button(self.register, text="CONTINUE", font="Helvetica 14 bold", command=lambda: self.handleRegister(self.entryName.get(), self.entryPass.get(), self.entryPass2.get()))
-        self.go.place(relx=0.4, rely=0.65)
+        self.labelrPass2 = Label(self.register, text="Confirm Password: ", font="Helvetica 12")
+        self.labelrPass2.place(relheight=0.2, relx=0.1, rely=0.5)
+        self.entryrPass2 = Entry(self.register, font="Helvetica 14", show="*")
+        self.entryrPass2.place(relwidth=0.4, relheight=0.12, relx=0.35, rely=0.5)
+        self.rgo = Button(self.register, text="CONTINUE", font="Helvetica 14 bold", command=lambda: self.handleRegister(self.entryrName.get(), self.entryrPass.get(), self.entryrPass2.get()))
+        self.rgo.place(relx=0.4, rely=0.65)
     
     def login(self):
         # login window
@@ -88,13 +88,19 @@ class GUI:
           
         # set the focus of the curser
         self.entryName.focus()
-          
+        
+        self.labelPass = Label(self.login, text="Password: ", font="Helvetica 12")
+        self.labelPass.place(relheight=0.2, relx=0.1, rely=0.35)
+        
+        self.entryPass = Entry(self.login, font="Helvetica 14", show="*")
+        self.entryPass.place(relwidth=0.4, relheight=0.12, relx=0.35, rely=0.35)
+                
         # create a Continue Button 
         # along with action
         self.go = Button(self.login,
                          text = "CONTINUE", 
                          font = "Helvetica 14 bold", 
-                         command = lambda: self.handleLogin(self.entryName.get()))
+                         command = lambda: self.handleLogin(self.entryName.get(), self.entryPass.get()))
           
         self.go.place(relx = 0.4,
                       rely = 0.55)
@@ -103,7 +109,7 @@ class GUI:
         self.register.place(relx = 0.4,
                       rely = 0.65)
         
-        
+
 
     
     def handleRegister(self, name, password, password2):
@@ -113,14 +119,18 @@ class GUI:
             response = json.loads(self.recv())
             if response["status"] == 'ok':
                 messagebox.showinfo("info", "register success")
+                self.entryrName.delete(0, END)
+                self.entryrPass.delete(0, END)
+                self.entryrPass2.delete(0, END)
                 self.register.withdraw()       
             else:
                 messagebox.showerror("error", response["status"])
-
+        else:
+            messagebox.showerror("error", "please fill in all fields")
             
-    def handleLogin(self, name):
-        if len(name) > 0:
-            msg = json.dumps({"action":"login", "name": name})
+    def handleLogin(self, name, password):
+        if len(name) > 0 and len(password) > 0:
+            msg = json.dumps({"action":"login", "name": name, "password": password})
             self.send(msg)
             response = json.loads(self.recv())
             if response["status"] == 'ok':
@@ -135,12 +145,18 @@ class GUI:
                 self.textCons.see(END)
                 # while True:
                 #     self.proc()
-            else:
+                process = threading.Thread(target=self.proc)
+                process.daemon = True
+                process.start()
+            else:   
                 messagebox.showerror("error", response["status"])
-        # the thread to receive messages
-            process = threading.Thread(target=self.proc)
-            process.daemon = True
-            process.start()
+                self.entryName.delete(0, END)
+                self.entryPass.delete(0, END)
+        else:
+            messagebox.showerror("error", "please fill in all fields")
+            self.entryName.delete(0, END)
+            self.entryPass.delete(0, END)
+            
             
     def bind_enter_key(self):
         if self.sm.get_state() == S_LOGGEDIN:
@@ -186,6 +202,7 @@ class GUI:
                              fg = "#EAECEE",
                              font = "Helvetica 14", 
                              padx = 5,
+                             wrap="word",
                              pady = 5)
           
         self.textCons.place(relheight = 0.745,
