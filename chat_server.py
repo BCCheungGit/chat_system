@@ -3,7 +3,7 @@ Created on Tue Jul 22 00:47:05 2014
 
 @author: alina, zzhang
 """
-
+import os
 import time
 import socket
 import select
@@ -40,45 +40,94 @@ class Server:
         sock.setblocking(0)
         self.new_clients.append(sock)
         self.all_sockets.append(sock)
-
-    def login(self, sock):
+    
+    def save_user_info(self, name, password):
+        self.indices[name] = indexer.Index(name, password)
+        with open("Users/" + name + '.idx', 'wb') as f:
+            pkl.dump(self.indices[name], f)
+        
+    def check_user_info(self, name):
+        try:
+            with open("Users/" + name + '.idx', 'rb') as f:
+                try:
+                    pkl.load(f)
+                    return True
+                except EOFError:
+                    return False
+        except IOError:
+            return False
+    
+    def check_password(self, name, password):
+        try:
+            with open("Users/" + name + '.idx', 'rb') as f:
+                try:
+                    user = pkl.load(f)
+                    if user.password == password:
+                        return True
+                    else:
+                        return False
+                except EOFError:
+                    return False
+        except IOError:
+            return False
+    
+    
+    def auth(self, sock):
         #read the msg that should have login code plus username
         try:
             msg = json.loads(myrecv(sock))
             if len(msg) > 0:
-
-                if msg["action"] == "login":
+                if msg["action"] == "register":
                     name = msg["name"]
-                    if self.group.is_member(name) != True:
-                        #move socket from new clients list to logged clients
-                        self.new_clients.remove(sock)
-                        #add into the name to sock mapping
-                        self.logged_name2sock[name] = sock
-                        self.logged_sock2name[sock] = name
-                        #load chat history of that user
-                        if name not in self.indices.keys():
-                            try:
-                                self.indices[name]=pkl.load(open(name+'.idx','rb'))
-                            except IOError: #chat index does not exist, then create one
-                                self.indices[name] = indexer.Index(name)
-                        print(name + ' logged in')
-                        self.group.join(name)
-                        mysend(sock, json.dumps({"action":"login", "status":"ok"}))
-                    else: #a client under this name has already logged in
-                        mysend(sock, json.dumps({"action":"login", "status":"duplicate"}))
-                        print(name + ' duplicate login attempt')
+                    password = msg["password"]
+                    password2 = msg["password2"]
+                    if password != password2:
+                        mysend(sock, json.dumps({"action": "register", "status": "mismatched passwords"}))
+                    elif self.check_user_info(name):
+                        mysend(sock, json.dumps({"action": "register", "status": "duplicate username"}))
+                    else:  
+                        self.save_user_info(name, password)
+                        mysend(sock, json.dumps({"action": "register", "status": "ok"}))
+                            
+                elif msg["action"] == "login":
+                    name = msg["name"]
+                    password = msg["password"]
+                    if self.check_user_info(name) == False:
+                        mysend(sock, json.dumps({"action": "login", "status": "User does not exist, please register"}))   
+                    elif self.check_password(name, password):          
+                        if self.group.is_member(name) != True:
+                                #move socket from new clients list to logged clients
+                                self.new_clients.remove(sock)
+                                #add into the name to sock mapping
+                                self.logged_name2sock[name] = sock
+                                self.logged_sock2name[sock] = name
+                                #load chat history of that user
+                                if name not in self.indices.keys():
+                                    try:
+                                        self.indices[name]=pkl.load(open(name+'.idx','rb'))
+                                    except IOError: #chat index does not exist, then create one
+                                        self.indices[name] = indexer.Index(name, None)
+                                print(name + ' logged in')
+                                self.group.join(name)
+                                mysend(sock, json.dumps({"action":"login", "status":"ok"}))
+                            
+                        else: #a client under this name has already logged in
+                            mysend(sock, json.dumps({"action":"login", "status":"duplicate"}))
+                            print(name + ' duplicate login attempt')
+                    else:
+                        mysend(sock, json.dumps({"action": "login", "status": "wrong password"}))
                 else:
                     print ('wrong code received')
             else: #client died unexpectedly
+                print("client died...")
                 self.logout(sock)
         except:
+            print("no message received...")
             self.all_sockets.remove(sock)
 
     def logout(self, sock):
         #remove sock from all lists
         name = self.logged_sock2name[sock]
-        with open("Users/" + name + '.idx','wb') as f:
-            pkl.dump(self.indices[name], f)
         # pkl.dump(self.indices[name], open("Users/" + name + '.idx','wb'))
         del self.indices[name]
         del self.logged_name2sock[name]
@@ -197,7 +246,7 @@ class Server:
            print('checking new clients..')
            for newc in self.new_clients[:]:
                if newc in read:
-                   self.login(newc)
+                   self.auth(newc)
            print('checking for new connections..')
            if self.server in read :
                #new client request

@@ -66,7 +66,7 @@ class ClientSM:
                 elif my_msg == 'time':
                     mysend(self.s, json.dumps({"action":"time"}))
                     time_in = json.loads(myrecv(self.s))["results"]
-                    self.out_msg += "Time is: " + time_in
+                    self.out_msg += "Time is: " + time_in + "\n"
 
                 elif my_msg == 'who':
                     mysend(self.s, json.dumps({"action":"list"}))
@@ -124,9 +124,12 @@ class ClientSM:
             if len(my_msg) > 0:     # my stuff going out
                 mysend(self.s, json.dumps({"action":"exchange", "from":"[" + self.me + "]", "message":my_msg}))
                 if my_msg == 'bye':
+                    self.out_msg += 'bye.\n'
                     self.disconnect()
                     self.state = S_LOGGEDIN
                     self.peer = ''
+                else:
+                    self.out_msg += my_msg + '\n'
             if len(peer_msg) > 0:    # peer's stuff, coming in
                 peer_msg = json.loads(peer_msg)
                 if peer_msg["action"] == "connect":
@@ -134,7 +137,7 @@ class ClientSM:
                 elif peer_msg["action"] == "disconnect":
                     self.state = S_LOGGEDIN
                 else:
-                    self.out_msg += peer_msg["from"] + peer_msg["message"]
+                    self.out_msg += peer_msg["from"] + peer_msg["message"] + '\n'
 
 
             # Display the menu again

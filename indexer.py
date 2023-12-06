@@ -7,8 +7,9 @@ Created on Sat Jul  5 11:38:58 2014
 import pickle
 
 class Index:
-    def __init__(self, name):
+    def __init__(self, name, password):
         self.name = name
+        self.password = password
         self.msgs = [];
         self.index = {}
         self.total_msgs = 0
@@ -50,7 +51,7 @@ class Index:
 
 class PIndex(Index):
     def __init__(self, name):
-        super().__init__(name)
+        super().__init__(name, None)
         roman_int_f = open('roman.txt.pk', 'rb')
         self.int2roman = pickle.load(roman_int_f)
         roman_int_f.close()
