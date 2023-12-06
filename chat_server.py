@@ -77,7 +77,9 @@ class Server:
     def logout(self, sock):
         #remove sock from all lists
         name = self.logged_sock2name[sock]
-        pkl.dump(self.indices[name], open(name + '.idx','wb'))
+        with open("Users/" + name + '.idx','wb') as f:
+            pkl.dump(self.indices[name], f)
+        # pkl.dump(self.indices[name], open("Users/" + name + '.idx','wb'))
         del self.indices[name]
         del self.logged_name2sock[name]
         del self.logged_sock2name[sock]
