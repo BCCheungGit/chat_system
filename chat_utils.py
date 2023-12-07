@@ -15,12 +15,14 @@ menu = "\n++++ Choose one of the following commands\n \
         c _peer_: to connect to the _peer_ and chat\n \
         ? _term_: to search your chat logs where _term_ appears\n \
         p _#_: to get number <#> sonnet\n \
+        b _message_: to send a message to the chatbot \n \
         q: to leave the chat system\n\n"
 
 S_OFFLINE   = 0
 S_CONNECTED = 1
 S_LOGGEDIN  = 2
 S_CHATTING  = 3
+S_BOT = 4
 
 SIZE_SPEC = 5
 
