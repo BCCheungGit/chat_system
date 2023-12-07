@@ -135,6 +135,11 @@ class Server:
         self.all_sockets.remove(sock)
         self.group.leave(name)
         sock.close()
+        
+        
+        
+        
+        
 
 #==============================================================================
 # main command switchboard

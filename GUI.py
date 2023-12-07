@@ -25,7 +25,6 @@ class GUI:
         self.register.title("Register")
         self.register.resizable(width=False, height=False)
         self.register.configure(width=400, height=300)
-        self.register.configure(bg="#17202A")
         self.pls = Label(self.register, text="Are you new? Register here", justify=CENTER, font="Helvetica 14 bold")
         self.pls.place(relheight=0.15, relx=0.2, rely=0.07)
         
@@ -42,7 +41,7 @@ class GUI:
         self.entryrPass.place(relwidth=0.4, relheight=0.12, relx=0.35, rely=0.35)
         
         
-        self.labelrPass2 = Label(self.register, text="Confirm Password: ", font="Helvetica 12")
+        self.labelrPass2 = Label(self.register, text="Confirm Password: ", font="Helvetica 8")
         self.labelrPass2.place(relheight=0.2, relx=0.1, rely=0.5)
         self.entryrPass2 = Entry(self.register, font="Helvetica 14", show="*")
         self.entryrPass2.place(relwidth=0.4, relheight=0.12, relx=0.35, rely=0.5)
@@ -69,7 +68,7 @@ class GUI:
                        rely = 0.07)
         # create a Label
         self.labelName = Label(self.login,
-                               text = "Name: ",
+                               text = "Username: ",
                                font = "Helvetica 12")
           
         self.labelName.place(relheight = 0.2,
@@ -98,7 +97,7 @@ class GUI:
         # create a Continue Button 
         # along with action
         self.go = Button(self.login,
-                         text = "CONTINUE", 
+                         text = "Login", 
                          font = "Helvetica 14 bold", 
                          command = lambda: self.handleLogin(self.entryName.get(), self.entryPass.get()))
           
@@ -107,7 +106,7 @@ class GUI:
         
         self.register = Button(self.login, text="Register", font="Helvetica 14 bold", command=self.go_register)
         self.register.place(relx = 0.4,
-                      rely = 0.65)
+                      rely = 0.75)
         
 
 
@@ -161,11 +160,7 @@ class GUI:
     def bind_enter_key(self):
         if self.sm.get_state() == S_LOGGEDIN:
             self.entryMsg.bind("<Return>", lambda event: self.sendButton(self.entryMsg.get()))
-        else:
-            try:
-                self.entryName.bind("<Return>", lambda event: self.handleLogin(self.entryName.get()))
-            except:
-                self.entryName.bind("<Return>", lambda event: self.handleRegister(self.entryName.get(), self.entryPass.get(), self.entryPass2.get()))
+            
  
     # The main layout of the chat
     def layout(self,name):
