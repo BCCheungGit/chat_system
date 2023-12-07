@@ -67,7 +67,14 @@ class ClientSM:
                     mysend(self.s, json.dumps({"action":"time"}))
                     time_in = json.loads(myrecv(self.s))["results"]
                     self.out_msg += "Time is: " + time_in + "\n"
-
+                
+                elif my_msg[0] == 'b':
+                    message = my_msg[1:]
+                    mysend(self.s, json.dumps({"action":"bot", "message":message}))
+                    self.out_msg += "[You]: " + message + "\n"
+                    result = json.loads(myrecv(self.s))["results"]
+                    self.out_msg += "[ChatBot]: " + result + "\n"
+                    
                 elif my_msg == 'who':
                     mysend(self.s, json.dumps({"action":"list"}))
                     logged_in = json.loads(myrecv(self.s))["results"]

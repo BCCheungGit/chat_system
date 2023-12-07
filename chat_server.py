@@ -15,6 +15,11 @@ import pickle as pkl
 from chat_utils import *
 import chat_group as grp
 
+import requests
+
+url = "https://robomatic-ai.p.rapidapi.com/api"
+
+
 class Server:
     def __init__(self):
         self.new_clients = [] #list of new sockets of which the user id is not known
@@ -189,6 +194,29 @@ class Server:
                 from_name = self.logged_sock2name[from_sock]
                 msg = self.group.list_all()
                 mysend(from_sock, json.dumps({"action":"list", "results":msg}))
+#==============================================================================
+#             Talk to AI Chatbot
+#==============================================================================
+            elif msg["action"] == "bot":
+                message = msg["message"]
+                payload = {
+                    "in": message,
+                    "op": "in",
+                    "cbot": "1",
+                    "SesionId": "RapidAPI1",
+                    "cbid": "1",
+	                "key": "RHMN5hnQ4wTYZBGCF3dfxzypt68rVP",
+	                "ChatSource": "RapidAPI",
+	                "duration": "1"
+                }
+                headers = {
+	                "content-type": "application/x-www-form-urlencoded",
+	                "X-RapidAPI-Key": "08221f0e07msh9ce2a8ae74c15fbp16a631jsn675a3a8e5553",
+	                "X-RapidAPI-Host": "robomatic-ai.p.rapidapi.com"
+                }
+                response = requests.post(url, data=payload, headers=headers)
+                mysend(from_sock, json.dumps({"action":"bot", "results":response.json()["out"]}))
+                
 #==============================================================================
 #             retrieve a sonnet
 #==============================================================================
