@@ -3,8 +3,12 @@ import threading
 import select
 from tkinter import *
 from tkinter import messagebox
+from tkinter import ttk
+
 from chat_utils import *
 import json
+
+
 
 # GUI class for the chat
 class GUI:
@@ -233,7 +237,6 @@ class GUI:
                                 width = 20,
                                 bg = "#ABB2B9",
                                 command = lambda : self.sendButton(self.entryMsg.get()))
-          
         self.buttonMsg.place(relx = 0.77,
                              rely = 0.008,
                              relheight = 0.06, 
