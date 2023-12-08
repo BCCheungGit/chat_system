@@ -28,7 +28,7 @@ class GUI:
         self.pls = Label(self.register, text="Are you new? Register here", justify=CENTER, font="Helvetica 14 bold")
         self.pls.place(relheight=0.15, relx=0.2, rely=0.07)
         
-        self.labelrName = Label(self.register, text="Name: ", font="Helvetica 12")
+        self.labelrName = Label(self.register, text="Username: ", font="Helvetica 12")
         self.labelrName.place(relheight=0.2, relx=0.1, rely=0.2)
         self.entryrName = Entry(self.register, font="Helvetica 14")
         self.entryrName.place(relwidth=0.4, relheight=0.12, relx=0.35, rely=0.2)
@@ -147,6 +147,7 @@ class GUI:
                 process = threading.Thread(target=self.proc)
                 process.daemon = True
                 process.start()
+                
             else:   
                 messagebox.showerror("error", response["status"])
                 self.entryName.delete(0, END)

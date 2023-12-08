@@ -5,6 +5,7 @@ Created on Sun Apr  5 00:00:32 2015
 """
 from chat_utils import *
 import json
+import threading
 
 class ClientSM:
     def __init__(self, s):
@@ -70,10 +71,16 @@ class ClientSM:
                 
                 elif my_msg[0] == 'b':
                     message = my_msg[1:]
-                    mysend(self.s, json.dumps({"action":"bot", "message":message}))
                     self.out_msg += "[You]: " + message + "\n"
-                    result = json.loads(myrecv(self.s))["results"]
-                    self.out_msg += "[ChatBot]: " + result + "\n"
+                    mysend(self.s, json.dumps({"action":"bot", "message":message}))
+                    def bot_response():
+                        response = json.loads(myrecv(self.s))["results"]
+                        self.out_msg += "[ChatBot]: " + response + "\n"
+                    response_thread = threading.Thread(target=bot_response)
+                    response_thread.start()
+                    response_thread.join()
+                    
+
                     
                 elif my_msg == 'who':
                     mysend(self.s, json.dumps({"action":"list"}))
