@@ -26,9 +26,7 @@ pip install -r requirements.txt
 
 to install required packages.
 
-
-
-
+-----------------------------------
 
 To run the chat server, run:
 
@@ -44,7 +42,7 @@ python chat_cmdl_client.py
 
 ## Current Features:
 - [x] login and register pages, storing user data
-- [x] talk to a chatbot using RapidAPI and robomatic AI: https://robomatic.ai/
+- [x] talk to a chatbot using RapidAPI and robomatic AI: [More Info](https://robomatic.ai/)
 - [ ] light and dark mode with toggle button
 - [ ] text-based tic-tac-toe game
 
