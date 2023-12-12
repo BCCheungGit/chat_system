@@ -44,7 +44,7 @@ python chat_cmdl_client.py
 - [x] login and register pages, storing user data
 - [x] talk to a chatbot using RapidAPI and robomatic AI: [More Info](https://robomatic.ai/)
 - [ ] light and dark mode with toggle button
-- [ ] text-based tic-tac-toe game
+- [x] text-based tic-tac-toe game
 
 ## GUI TODO
 - [x] add login and sign up page
