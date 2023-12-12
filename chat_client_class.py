@@ -4,6 +4,7 @@ from chat_utils import *
 import client_state_machine as csm
 from GUI import *
 
+
 class Client:
     def __init__(self, args):
         self.args = args
@@ -13,7 +14,7 @@ class Client:
         self.socket.close()
 
     def init_chat(self):
-        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM )
+        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         svr = SERVER if self.args.d == None else (self.args.d, CHAT_PORT)
         self.socket.connect(svr)
         self.sm = csm.ClientSM(self.socket)
